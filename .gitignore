@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.yarn/cache
+.yarn/install-state.gz
+.pnp.*
+
+# Build output
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+
+# Test / coverage
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+blob-report/
+.playwright-cli/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Scratch / generated artifacts
+tmp/
+.omx/
+.cache/
+.turbo/
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

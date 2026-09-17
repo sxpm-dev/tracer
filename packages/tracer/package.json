@@ -1,0 +1,50 @@
+{
+  "name": "@sx/tracer",
+  "version": "0.1.0",
+  "description": "Tiny zero-overhead tracer. Records call trees, markers, and timing — only inside an explicit scope.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "bench": "yarn build && node bench/tracer.bench.mjs",
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "trace",
+    "tracing",
+    "tracer",
+    "observability",
+    "instrumentation",
+    "decorator",
+    "marker",
+    "scope",
+    "performance",
+    "telemetry",
+    "browser",
+    "node"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "tinybench": "^6.0.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "workspaces": [
+    "app/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "bench": "yarn workspace @sx/tracer bench && yarn workspace @sx/runtime-context bench",
+    "bench:tracer": "yarn workspace @sx/tracer bench",
+    "bench:context": "yarn workspace @sx/runtime-context bench",
+    "build": "yarn workspace @sx/tracer build && yarn workspace @sx/runtime-context build",
+    "bench:llm-token": "node scripts/llm-token-benchmark.mjs",
+    "bench:llm-token:fixture": "node scripts/generate-llm-token-fixture.mjs",
+    "dev:web": "yarn workspace @sx/docs dev",
+    "build:web": "yarn workspace @sx/docs build",
+    "test": "yarn workspace @sx/tracer test && yarn workspace @sx/runtime-context test",
+    "typecheck": "yarn workspace @sx/tracer typecheck && yarn workspace @sx/runtime-context typecheck"
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447",
+  "devDependencies": {
+    "@ai-sdk/anthropic": "^3.0.77",
+    "@ai-sdk/openai": "^3.0.63",
+    "ai": "^6.0.182",
+    "zod": "^4.4.3"
+  }
+}

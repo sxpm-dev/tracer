@@ -1,0 +1,96 @@
+---
+title: "@sx"
+description: "Small runtime instrumentation packages for JavaScript."
+---
+
+<section className="sx-landing-hero">
+  <div className="sx-landing-kicker">Runtime instrumentation primitives</div>
+  <h1>Understand one operation without rewiring your app.</h1>
+  <div className="sx-landing-copy">{"Two focused packages for the boring, painful part of instrumentation: carrying operation identity through plain JavaScript and seeing what happened inside that operation. No Promise patching, no framework lock-in, no distributed tracing platform required."}</div>
+  <div className="sx-landing-actions">
+    <a href="/runtime-context">Open runtime-context docs</a>
+    <a href="/tracer">Open tracer docs</a>
+  </div>
+</section>
+
+<div className="sx-landing-proof">
+  <div>
+    <strong>Browser + edge friendly</strong>
+    <span>No dependency on Node-only async context APIs for the core path.</span>
+  </div>
+  <div>
+    <strong>Explicit lifecycle</strong>
+    <span>You open a scope, run work, and know where the boundary is.</span>
+  </div>
+  <div>
+    <strong>Small enough to reason about</strong>
+    <span>The APIs are tiny because the packages solve one problem each.</span>
+  </div>
+</div>
+
+<div className="sx-package-grid">
+  <a className="sx-package-card sx-package-card-large" href="/runtime-context">
+    <h2>@sx/runtime-context</h2>
+    <div>{"Store-only context for plain JavaScript. Use it for request ids, user ids, locales, tenants, and trace ids without threading parameters through every helper."}</div>
+    <span>Docs, API, guide, examples</span>
+  </a>
+  <a className="sx-package-card sx-package-card-large" href="/tracer">
+    <h2>@sx/tracer</h2>
+    <div>{"Scope-based tracing for call trees, inline markers, async steps, timing, and event forwarding. It records only when you open a trace scope."}</div>
+    <span>Docs, API, guide, examples</span>
+  </a>
+</div>
+
+## The problem
+
+Instrumentation often starts simple: add a request id to logs, record a few
+events around a workflow, find out why a checkout path did something weird. Then
+the code starts passing `requestId`, `userId`, `traceId`, and timing helpers
+through every function. Or it jumps straight to infrastructure built for
+distributed tracing when all you needed was visibility inside one process.
+
+`@sx/runtime-context` answers: "what ambient state belongs to this operation?"
+
+`@sx/tracer` answers: "what did this operation do?"
+
+They are separate docs because they are separate tools. You can use either
+alone, or combine them when a workflow needs both identity and a trace.
+
+## Real shape
+
+```ts
+import { createContext } from "@sx/runtime-context";
+import { marker, trace } from "@sx/tracer";
+
+const requestContext = createContext<{ requestId: string; userId?: string }>();
+
+const priceCart = trace(function priceCart(cart: Cart) {
+  const request = requestContext.get();
+
+  marker("items", { count: cart.items.length, requestId: request?.requestId });
+  return cart.items.reduce((sum, item) => sum + item.price, 0);
+});
+
+const report = await requestContext
+  .provider({ requestId: "req_123", userId: "u1" })
+  .run(() => trace.collect(() => priceCart(cart)));
+```
+
+The context package keeps the request identity available. The tracer records the
+operation shape. Neither package needs to own your application runtime.
+
+## Shared constraints
+
+- No `Promise` patching.
+- No built-in monkey-patching of timers or event targets.
+- Browser, edge runtime, and Node-friendly designs.
+- Tiny APIs with explicit lifecycle boundaries.
+
+## Pick a package
+
+| Need | Package | Why |
+| --- | --- | --- |
+| Read request metadata from helper code without passing it everywhere. | `@sx/runtime-context` | It provides scoped ambient state with a tiny API. |
+| Inspect a workflow's call tree and markers during development. | `@sx/tracer` | It records only inside `trace.collect`, so wrapped functions stay cheap outside a scope. |
+| Forward sampled in-process events to logs or telemetry. | `@sx/tracer` | `trace.subscribe` receives each recorded event. |
+| Full distributed tracing across services. | OpenTelemetry | `@sx/tracer` is intentionally smaller than spans, exporters, and propagation standards. |

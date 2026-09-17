@@ -1,0 +1,45 @@
+{
+  "name": "@sx/runtime-context",
+  "version": "0.1.0",
+  "description": "React.createContext for plain JS. Lightweight, store-only, survives await. No re-rendering.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "bench": "yarn build && node bench/context.bench.mjs",
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "context",
+    "runtime-context",
+    "async-context",
+    "scope",
+    "createContext",
+    "asynclocalstorage",
+    "propagation"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "tinybench": "^6.0.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
+  }
+}
