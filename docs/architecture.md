@@ -26,6 +26,9 @@ consumer application
 - **Original libraries** (`tracer`, `runtime-context`) remain independent and
   are not compatibility aliases for the new tracing package.
 
+For multi-bundle applications, see [shared runtime integration](./shared-runtime.md)
+for host ownership, global API usage, duplicate versions, and isolated contexts.
+
 ## Lifecycle
 
 Instrumentation is installed at definition time when the URL flag is active.

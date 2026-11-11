@@ -138,6 +138,24 @@ through dashboard blocks, columns, pages, or their own data-only UI.
 The basic dashboard works with no extension configuration. See
 [the extension guide](./packages/tracing/EXTENDING.md) for both halves of the pipeline.
 
+## One tracing layer across frontend subsystems
+
+**TL;DR:** the shell, microfrontends, shared libraries, and service adapters can
+contribute calls and custom data to one recording through compatible shared
+runtime/transport owners on `globalThis`.
+
+- The shell starts and releases the session; subsystems instrument functions and
+  register collectors with their own namespaces.
+- Compatible duplicate package imports in the **same JavaScript realm** share
+  capture state. The `__EDITOR_TRACING__` facade also supports legacy integrations.
+- Separate iframes, workers, tabs, and backend services do **not** automatically
+  share the recording. They need explicit correlation or a separate integration.
+
+Read [shared runtime and microfrontend integration](./docs/shared-runtime.md) for
+bootstrap order, a multi-subsystem example, the global API, version compatibility,
+and cross-boundary limitations. See [per-ray data](./docs/examples/ray-metadata.md)
+for attaching each subsystem's context to a shared operation.
+
 ## Work on the repository
 
 Use the Node version in [`.node-version`](./.node-version) and Yarn 1.

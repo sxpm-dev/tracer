@@ -4,6 +4,7 @@
 
 | Example | Use it when |
 | --- | --- |
+| [Multiple frontend subsystems](../shared-runtime.md#complete-example-three-subsystems-one-ray-one-recording) | Share one recording across namespaced modules and understand global runtime ownership. |
 | [Context across awaits and callbacks](./context-boundaries.md) | Compare local capture, explicit callback capture, and Node ALS propagation. |
 | [Markers, samples and reusable collectors](./tracing-data.md) | Choose the correct data scope, correlate a sample with a ray, or configure consumer-owned lifecycle hooks. |
 | [Dashboard extension recipes](./dashboard-recipes.md) | Add pages and columns, wrap core blocks, enrich the inspector, and compose features. |

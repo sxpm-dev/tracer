@@ -34,6 +34,7 @@ AI-driven execution.
 
 ## Understand and maintain
 
+- [Shared runtime across frontend subsystems](./shared-runtime.md): global ownership, microfrontends, collectors, load order, and realm/service boundaries.
 - [Architecture](./architecture.md): package boundaries, lifecycle, and extension ownership.
 - [Migration](./migration.md): original tracer versus the integrated packages.
 - [Error-stack context versus AsyncLocalStorage](./async-local-storage.md): mechanisms, measured results, safety and propagation gaps.
