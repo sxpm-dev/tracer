@@ -1,0 +1,118 @@
+{
+  "name": "@sx/dashboard",
+  "version": "1.0.0",
+  "description": "Extensible trace dashboard and local recording server",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.cjs",
+    "dist/**/*.d.ts",
+    "dist/**/*.css",
+    "dist/**/*.woff2",
+    "dist/dashboard/**",
+    "README.md",
+    "PHOSPHOR-LICENSE",
+    "FONT-LICENSE",
+    "dist/**/*.d.cts"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./data": {
+      "import": {
+        "types": "./dist/types/data.d.ts",
+        "default": "./dist/data.js"
+      },
+      "require": {
+        "types": "./dist/types/data.d.cts",
+        "default": "./dist/data.cjs"
+      }
+    },
+    "./server": {
+      "import": {
+        "types": "./dist/types/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": {
+        "types": "./dist/types/server.d.cts",
+        "default": "./dist/server.cjs"
+      }
+    },
+    "./vite": {
+      "import": {
+        "types": "./dist/types/vite.d.ts",
+        "default": "./dist/vite.js"
+      },
+      "require": {
+        "types": "./dist/types/vite.d.cts",
+        "default": "./dist/vite.cjs"
+      }
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "scripts": {
+    "build": "yarn clean && tsc && BUILD_FORMAT=esm vite build && BUILD_FORMAT=cjs vite build && vite build --config vite.app.config.ts && node finish-build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config ../../vitest.integration.config.ts",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "start": "node dist/cli.js"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "bin": {
+    "trace-dashboard": "./dist/cli.js",
+    "trace-performance-report": "./dist/report-cli.js",
+    "dashboard": "./dist/cli.js"
+  },
+  "dependencies": {
+    "@sx/recordings": "1.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^7.3.1"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@testing-library/react": "^14.3.1",
+    "@types/react": "^18.3.26",
+    "@types/react-dom": "^18.3.7",
+    "jsdom": "^26.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.14",
+    "typescript": "^5.9.3",
+    "@types/node": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=22.14"
+  },
+  "module": "./dist/index.js",
+  "license": "MIT"
+}

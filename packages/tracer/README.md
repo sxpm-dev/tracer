@@ -1,10 +1,15 @@
 # @sx/tracer
 
+This is an independent original library. For the integrated recording sessions and
+installable dashboard, see the [documentation index](../../docs/README.md) and
+[migration guide](../../docs/migration.md). Performance figures below are historical
+measurements; rerun the benchmarks on your target runtime before relying on them.
+
 Tiny tracer for browser and Node. Wraps functions to record a call tree, captures inline markers, and gets out of your way when nobody's listening.
 
-- **Zero overhead outside a scope** — `trace(fn)()` outside `trace.collect(...)` is ~2.9× the cost of an unwrapped call. In production code you don't pay for tracing you didn't ask for.
+- **Fast path outside a scope** — no recording is created, but the wrapper still has a cost. The historical benchmark measured about 2.9× an unwrapped call.
 - **One small API** — `trace`, `marker`, `@Trace`. That's it for 90% of usage.
-- **No prototype patching** — does not patch `Promise`, timers, event targets, or any built-ins. Safe to drop into any environment.
+- **No prototype patching** — does not patch `Promise`, timers, event targets, or any built-ins. Verify compatibility with your target runtime.
 - **Bounded memory** — LRU cap on retained scopes; per-event storage is parallel scalar arrays, not allocated objects. `TraceEvent` shapes are synthesized only when you read them.
 
 ## Install
@@ -72,7 +77,7 @@ const result = trace.collect(() => doStuff());
 
 When the scope ends, the heap is auto-cleared. There is no `trace.clear()` to remember.
 
-Outside any scope, traced functions short-circuit to a direct call. This is the **fast path** — measured at ~23 ns per call (close to a bare function call).
+Outside any scope, traced functions short-circuit to a direct call. This is the **fast path** — historically measured at ~23 ns per call; see the baseline and environment in the performance section.
 
 ### Markers
 
@@ -274,11 +279,11 @@ Marker recovery after `await` depends on the JS engine including named asynchron
 
 | Engine | Sync recording | `marker()` after `await` |
 |---|---|---|
-| V8 (Chrome, Node 12+, Edge, Bun, Deno) | ✅ | ✅ |
+| V8-based runtimes (Chrome, Node, Edge, Deno) | ✅ | Depends on async stack frames; verify |
 | SpiderMonkey (Firefox 95+) | ✅ | ⚠️ engine-dependent |
 | JavaScriptCore (Safari 16+) | ✅ | ⚠️ engine-dependent |
 
-Sync tracing works everywhere. Async marker recovery is reliable on V8. On Firefox/Safari, prefer placing `marker()` calls *before* any `await` in the function body, or wrap the post-await portion in `trace.step("phase", ...)` — the step provides its own named frame that's reliable to recover.
+Synchronous tracing does not require async stack recovery. Cross-await behavior depends on engine stack details; verify it in the target runtime and production bundle. On Firefox/Safari, prefer placing `marker()` calls *before* any `await` in the function body, or wrap the post-await portion in `trace.step("phase", ...)` — the step provides its own named frame that's reliable to recover.
 
 ## What this isn't
 

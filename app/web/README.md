@@ -1,7 +1,15 @@
-# @sx/docs
+# @sx/docs — existing website
 
 Documentation site for [`@sx/runtime-context`](../../packages/runtime-context) and
 [`@sx/tracer`](../../packages/tracer), built with [Nextra 4](https://nextra.site) on Next.js.
+
+## Current coverage
+
+This site currently documents the original tracer and runtime-context libraries.
+The integrated tracing, recordings, dashboard, and consumer-extension guides live
+in the [Markdown documentation index](../../docs/README.md). They have not yet been
+migrated to the website. Treat those Markdown files as the current documentation
+for the integrated packages. Website changes are a separate phase.
 
 ## Run it
 

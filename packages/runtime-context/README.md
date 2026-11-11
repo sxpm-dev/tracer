@@ -1,5 +1,10 @@
 # @sx/runtime-context
 
+This is an independent original library. For the integrated recording sessions and
+installable dashboard, see the [documentation index](../../docs/README.md) and
+[migration guide](../../docs/migration.md). Performance figures below are historical
+measurements; rerun the benchmarks on your target runtime before relying on them.
+
 `React.createContext` for plain JS. Store-only — no providers component, no consumer subscriptions, no re-rendering. Just a value scoped to a function call that survives `await`.
 
 - **Tiny** — one file, no dependencies.
@@ -178,7 +183,7 @@ ctx.provider(1).run(() => {
 });
 ```
 
-This is the same kind of limitation `AsyncLocalStorage` has if you forget to `run` over a promise. It's structural — fixing it transparently would require patching `Promise.prototype.then` and the timer/event APIs, which this package deliberately doesn't do.
+This package does not automatically propagate across unrelated task boundaries. `AsyncLocalStorage` has different propagation semantics; do not assume the same behavior. Use `capture` for explicit callback propagation here.
 
 ## Performance
 
@@ -195,7 +200,7 @@ Numbers from `yarn bench` on Node 22, paired against Node's `AsyncLocalStorage` 
 
 **The picture:**
 
-- **Sync usage — `runtime-context` is faster than `AsyncLocalStorage`** by 1.3-1.7×. ALS pays for hooking into Node's `async_hooks` even on sync calls; we don't have that overhead.
+- **Historical sync benchmark — `runtime-context` was faster than `AsyncLocalStorage`** by 1.3-1.7×. ALS pays for hooking into Node's `async_hooks` even on sync calls; we don't have that overhead.
 - **Async usage where you read context many times across awaits — `AsyncLocalStorage` is dramatically faster** (~19× on the worst case). Node threads the store through every async boundary natively via `async_hooks`; we walk the stack with `new Error().stack` to recover the active frame after each `await`, and that costs ~6 μs per walk.
 - **Async usage with the *capture-local* pattern — both are essentially equal** and close to plain async. Read the context once at the top of the async function, then use the local.
 
@@ -245,16 +250,16 @@ The propagation-across-`await` trick depends on the JS engine emitting **named a
 
 | Engine | Sync `provider/.get` | Cross-`await` `.get` |
 |---|---|---|
-| V8 (Chrome, Node 12+, Edge, Bun, Deno) | ✅ | ✅ |
-| SpiderMonkey (Firefox 95+) | ✅ | ⚠️ engine-dependent; works on recent versions |
+| V8-based runtimes (Chrome, Node, Edge, Deno) | ✅ | Depends on async stack frames; verify |
+| SpiderMonkey (Firefox 95+) | ✅ | ⚠️ engine-dependent; verify your target version |
 | JavaScriptCore (Safari 16+) | ✅ | ⚠️ engine-dependent; sync-only is the safe assumption |
 
-Sync usage (the common path — read context inside a `run` callback) is portable everywhere. Cross-`await` recovery depends on the engine giving us a usable async stack. If you target older Safari or rely on async recovery in browsers other than V8-based ones, prefer the **capture-local pattern** (read once at the top of an async function, use the local from then on) — it works regardless of stack format.
+Synchronous usage (read context inside a `run` callback) does not require async stack recovery. Cross-`await` recovery depends on the engine giving us a usable async stack. If you target older Safari or rely on async recovery in browsers other than V8-based ones, prefer the **capture-local pattern** (read once at the top of an async function, use the local from then on) — it works regardless of stack format.
 
 ## What this isn't
 
 - **Not React Context.** No components, no subscriptions, no re-renders. If a provider's value changes, consumers don't get notified. Set the value once at the boundary of a logical operation; read it inside.
-- **Not `AsyncLocalStorage`.** AsyncLocalStorage propagates across every microtask hop (including setTimeout, event listeners, etc.) by patching the runtime. This package only propagates through `await` chains that pass through `.run`. The trade is portability (works in browsers) for completeness.
+- **Not `AsyncLocalStorage`.** AsyncLocalStorage propagates across every microtask hop (including setTimeout, event listeners, etc.) using runtime-integrated async context support. This package only propagates through `await` chains that pass through `.run`. The trade is portability (works in browsers) for completeness.
 - **Not a service locator.** Use it for ambient context — request id, current user, locale, telemetry tags. Not for arbitrary dependency injection.
 
 ## License

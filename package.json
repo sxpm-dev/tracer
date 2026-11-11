@@ -8,19 +8,25 @@
     "bench": "yarn workspace @sx/tracer bench && yarn workspace @sx/runtime-context bench",
     "bench:tracer": "yarn workspace @sx/tracer bench",
     "bench:context": "yarn workspace @sx/runtime-context bench",
-    "build": "yarn workspace @sx/tracer build && yarn workspace @sx/runtime-context build",
+    "build": "yarn workspace @sx/tracer build && yarn workspace @sx/runtime-context build && yarn workspace @sx/tracing build && yarn workspace @sx/recordings build && yarn workspace @sx/dashboard build",
     "bench:llm-token": "node scripts/llm-token-benchmark.mjs",
     "bench:llm-token:fixture": "node scripts/generate-llm-token-fixture.mjs",
     "dev:web": "yarn workspace @sx/docs dev",
     "build:web": "yarn workspace @sx/docs build",
-    "test": "yarn workspace @sx/tracer test && yarn workspace @sx/runtime-context test",
-    "typecheck": "yarn workspace @sx/tracer typecheck && yarn workspace @sx/runtime-context typecheck"
+    "test": "yarn workspace @sx/tracer test && yarn workspace @sx/runtime-context test && yarn workspace @sx/tracing test && yarn workspace @sx/recordings test && yarn workspace @sx/dashboard test",
+    "typecheck": "yarn workspace @sx/tracer typecheck && yarn workspace @sx/runtime-context typecheck && yarn workspace @sx/tracing typecheck && yarn workspace @sx/recordings typecheck && yarn workspace @sx/dashboard typecheck",
+    "start:dashboard": "yarn workspace @sx/dashboard start",
+    "test:packages": "node scripts/test-package-artifacts.mjs"
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447",
   "devDependencies": {
     "@ai-sdk/anthropic": "^3.0.77",
     "@ai-sdk/openai": "^3.0.63",
     "ai": "^6.0.182",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "vitest": "^4.0.14",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/dom": "^10.4.1",
+    "jsdom": "^26.1.0"
   }
 }

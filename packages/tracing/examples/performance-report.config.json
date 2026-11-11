@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "title": "Editor performance comparison",
+  "scenarios": [
+    {
+      "id": "dynamic",
+      "name": "Dynamic line and menu",
+      "baselineCheckpointId": "baseline",
+      "checkpoints": [
+        { "id": "baseline", "name": "Baseline" },
+        { "id": "platform", "name": "Platform optimized" },
+        { "id": "final", "name": "Platform + editor optimized" }
+      ],
+      "sessions": {
+        "baseline": "session-muhwwt6x-awx",
+        "platform": "session-mui0kvd1-1",
+        "final": "session-muiqqcmk-1"
+      }
+    },
+    {
+      "id": "button",
+      "name": "Button drag, resize and styles",
+      "baselineCheckpointId": "baseline",
+      "checkpoints": [
+        { "id": "baseline", "name": "Baseline" },
+        { "id": "platform", "name": "Platform optimized" },
+        { "id": "final", "name": "Platform + editor optimized" }
+      ],
+      "sessions": {
+        "baseline": "session-muhxqur5-2",
+        "platform": "session-mui045xp-1",
+        "final": "session-muiqo0rk-1"
+      }
+    }
+  ]
+}

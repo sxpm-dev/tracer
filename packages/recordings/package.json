@@ -1,0 +1,50 @@
+{
+  "name": "@sx/recordings",
+  "version": "1.0.0",
+  "description": "Recording sessions and streaming transport for tracing",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": true,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "yarn clean && tsc && vite build && node finish-build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config ../../vitest.integration.config.ts",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1",
+    "vitest": "^4.0.14",
+    "typescript": "^5.9.3",
+    "@types/node": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=22.14"
+  },
+  "module": "./dist/index.js",
+  "dependencies": {
+    "@sx/tracing": "1.0.0"
+  },
+  "license": "MIT"
+}

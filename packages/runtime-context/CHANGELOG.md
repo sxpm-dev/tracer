@@ -14,7 +14,7 @@ Initial release.
 ### Behavior
 
 - Synchronous reads walk an in-memory frame chain.
-- Reads after `await` walk the JS engine's async stack to recover the active frame via a pool of pre-allocated async wrappers (named `__sx_ctx__<slot>`). Reliable on V8 (Chrome, Node 12+, Edge, Bun, Deno); engine-dependent on SpiderMonkey/JavaScriptCore.
+- Reads after `await` walk the JS engine's async stack to recover the active frame via a pool of pre-allocated async wrappers (named `__sx_ctx__<slot>`). Reliable on V8-based runtimes (Chrome, Node, Edge, Deno); engine-dependent on SpiderMonkey/JavaScriptCore.
 - Concurrent provider scopes are isolated by slot.
 - The current frame is restored on synchronous throw and on awaited rejection.
 - Fire-and-forget plain async (a promise not returned from the `.run` callback) does not propagate context — same limitation as forgetting to `run` an `AsyncLocalStorage`.
