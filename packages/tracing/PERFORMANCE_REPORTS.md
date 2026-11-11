@@ -9,6 +9,10 @@ HTML includes its evidence bundle and works offline, including scenario tabs,
 ranking controls, theme switching, and print/PDF. The dashboard requires no
 metadata entry or authored narrative to generate a report.
 
+Use reports in the [AI-assisted optimization workflow](../../docs/ai-runtime-workflow.md):
+provide the evidence with the matching source revision, then compare a fresh
+recording after changing the code.
+
 ## Regenerate with the CLI
 
 Run the recording server against the same saved-recording directory, then run:

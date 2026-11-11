@@ -7,6 +7,64 @@ components or serve their own dashboard build.
 
 **Start here: [Documentation](./docs/README.md) · [First recording](./docs/getting-started.md) · [How stack recovery works](./docs/how-tracing-works.md) · [Consumer extensions](./packages/tracing/EXTENDING.md)**
 
+## Understand runtime behavior with AI, then verify the improvement
+
+Give an AI your code **and evidence of what that code did during a real scenario**.
+Use the recording to ask concrete questions, connect the answers to source, and
+measure whether an optimization actually helped.
+
+```text
+Add tracing to meaningful operations
+                ↓
+Record a real interaction or workload
+                ↓
+Give AI the recording data + matching source revision + scenario
+                ↓
+Ask how the code behaved at runtime
+                ↓
+AI connects observed calls, timings and custom data to source locations
+                ↓
+Ask for a targeted optimization and correctness tests
+                ↓
+Record the same scenario again → compare baseline and candidate
+                ↺
+```
+
+1. **Add tracing.** Use stable names and namespaces. Add ray metadata, cache-hit
+   markers, or consumer samples to explain application-specific behavior.
+2. **Run a recording.** Reproduce the interaction you care about and save a baseline.
+3. **Feed the evidence to AI.** Provide JSON/JSONL or report evidence, the matching
+   source commit, and the scenario. Large recordings can be queried incrementally.
+4. **Ask runtime questions.** “Why was this function called 200 times?”, “Which
+   path repeated the database lookup?”, or “Did cache misses cluster in this ray?”
+5. **Match observations to code.** Ask for a trace-to-source map with files/functions,
+   evidence, and any ambiguous or uninstrumented paths identified explicitly.
+6. **Optimize and test.** Ask for a change addressing the measured behavior, with
+   tests preserving correctness.
+7. **Record again and compare.** Use the same workload and capture settings. Check
+   the expected improvement, errors, and regressions; repeat before claiming a win.
+
+### Why not just ask AI to run the application?
+
+Both approaches are useful and can be combined. An AI that runs the app must first
+reproduce the right state, inputs, interactions, and environment. A recording lets
+it inspect an execution you already captured, including consumer-specific context.
+
+| Approach | Strength | Limitation |
+| --- | --- | --- |
+| Give AI a recording and matching source | Repeatable evidence from the chosen run; exposes recorded call counts, relationships, timings, and domain data | Only instrumented/captured behavior is visible; overhead and missing context can mislead |
+| Ask AI to run the app itself | It can explore, change inputs, reproduce failures, and test new hypotheses | Setup and reproduction may be difficult; a different environment may exercise a different path |
+| Combine them | Start from observed evidence, then use controlled runs to test the explanation | Still requires representative scenarios, correctness tests, and comparable measurements |
+
+**Source matching is an analysis task, not an automatic completeness guarantee.**
+The library does not upload to an AI, bundle the repository, or automatically
+resolve every event to a source line. Stable instrumentation names and the exact
+source revision help the AI build that mapping. Missing instrumentation and
+ambiguous names must remain visible gaps, not invented explanations.
+
+See the [AI-assisted optimization workflow](./docs/ai-runtime-workflow.md) for
+handoff artifacts, prompt examples, source mapping, and before/after comparisons.
+
 ## Packages
 
 | Package | Purpose | Guide |
