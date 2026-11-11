@@ -50,6 +50,3 @@ Thumbs.db
 # Local import provenance; publish the integrated packages only.
 /epp-tracing-source/
 /epp-tracing-source-*.zip
-
-# Website guides are generated from repository Markdown.
-/app/web/content/guide/

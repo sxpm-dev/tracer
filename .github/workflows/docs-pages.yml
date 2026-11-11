@@ -19,7 +19,7 @@ jobs:
       - run: yarn install --frozen-lockfile
       - name: Build and validate the project-site export
         env:
-          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          SITE_BASE_PATH: /${{ github.event.repository.name }}
         run: |
           yarn build:web
           yarn workspace @sx/docs test

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { JSDOM } from 'jsdom';
 import { DatabaseSync } from 'node:sqlite';
 import { describe, expect, it } from 'vitest';

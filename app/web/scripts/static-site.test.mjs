@@ -10,7 +10,7 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 
 const output = fileURLToPath(new URL('../out/', import.meta.url));
-const base = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const base = process.env.SITE_BASE_PATH ?? process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const files = (await readdir(output, { recursive: true })).filter(file => file.endsWith('.html'));
 const pages = new Map();
 for (const file of files) pages.set(file, new JSDOM(await readFile(path.join(output, file), 'utf8')).window.document);
@@ -53,8 +53,8 @@ test('local links and assets resolve under the configured deployment prefix', as
 
 test('overview describes the mechanism and consumers without a marketing hero', () => {
   const doc = pages.get('index.html');
-  assert.ok(doc.querySelector('h1').textContent.includes('code actually runs'));
-  assert.ok(doc.querySelector('article').textContent.includes('No error is thrown'));
+  assert.ok(doc.querySelector('h1').textContent.includes('Stack-based tracing'));
+  assert.ok(doc.querySelector('article').textContent.includes('does not throw it'));
   assert.ok(!doc.querySelector('[class*="landing"]'));
 });
 
@@ -77,7 +77,7 @@ test('preview server serves root, deep links, assets, and missing-page responses
     for (const page of ['', 'guide/how-tracing-works/', 'icon.svg']) {
       const response = await fetch(new URL(page, url));
       assert.equal(response.status, 200, page || 'root');
-      if (!page) assert.ok((await response.text()).includes('Trace how your code actually runs'));
+      if (!page) assert.ok((await response.text()).includes('Stack-based tracing'));
     }
     assert.equal((await fetch(new URL('missing-page/', url))).status, 404);
   } finally {
@@ -100,7 +100,37 @@ test('generated guides preserve every source code example', async () => {
   };
   for (const [, slug, , file] of guides) {
     const source = await readFile(path.join(root, file), 'utf8');
-    const generated = await readFile(path.join(root, 'app/web/content/guide', `${slug}.md`), 'utf8');
-    assert.deepEqual(code(generated), code(source), `Code changed in ${slug}`);
+    const rendered = [...pages.get(`guide/${slug}/index.html`).querySelectorAll('pre code')].map(node => node.textContent);
+    assert.deepEqual(rendered, code(source).map(block => block.value), `Code changed in ${slug}`);
   }
+});
+
+
+test('pages ship one small enhancement script, with no framework runtime', async () => {
+  for (const document of pages.values()) {
+    const scripts = [...document.querySelectorAll('script')];
+    assert.equal(scripts.length, 1);
+    assert.ok(scripts[0].defer);
+    assert.ok(!document.documentElement.innerHTML.includes('/_next/'));
+    assert.ok(document.querySelector('.sx-navigation-panel[open]'), 'Navigation is available without JavaScript');
+  }
+  const script = pages.get('index.html').querySelector('script').src.slice(base.length);
+  assert.ok((await readFile(path.join(output, script))).length < 6000);
+});
+
+test('topic filter handles matches and empty results, and mobile navigation is native', async () => {
+  const dom = new JSDOM(await readFile(path.join(output, 'index.html'), 'utf8'), { runScripts: 'outside-only' });
+  dom.window.matchMedia = () => ({ matches: true, addEventListener() {} });
+  dom.window.eval(await readFile(new URL('../assets/site.js', import.meta.url), 'utf8'));
+  const doc = dom.window.document;
+  assert.equal(doc.querySelector('.sx-navigation-panel').open, false);
+  const input = doc.querySelector('#filter-guides');
+  input.value = 'unmatched-topic';
+  input.dispatchEvent(new dom.window.Event('input'));
+  assert.equal(doc.querySelector('#filter-empty').hidden, false);
+  input.value = 'stack';
+  input.dispatchEvent(new dom.window.Event('input'));
+  assert.equal(doc.querySelector('#filter-empty').hidden, true);
+  assert.ok([...doc.querySelectorAll('[data-nav-group] li')].some(item => !item.hidden && item.textContent.includes('Error.stack')));
+  dom.window.close();
 });
