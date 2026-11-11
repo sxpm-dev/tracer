@@ -29,6 +29,8 @@ Read these guides directly on GitHub. The website migration is a separate phase.
 
 - [Architecture](./architecture.md): package boundaries, lifecycle, and extension ownership.
 - [Migration](./migration.md): original tracer versus the integrated packages.
+- [Error-stack context versus AsyncLocalStorage](./async-local-storage.md): mechanisms, measured results, safety and propagation gaps.
+- [Measured Node 22/24 benchmark report](./benchmarks/context-2026-11-11.md): reproducible commands, complete output and limitations.
 - [Performance and test evidence](./performance.md): how to measure and what is not yet established.
 - [Troubleshooting](./troubleshooting.md): activation, transport, missing data, and UI issues.
 - [Development and release](./development.md): commands, artifact checks, and release preparation.

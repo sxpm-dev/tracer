@@ -45,6 +45,9 @@ entry point. Node 22.14 or newer is required for the server.
 
 ## Consumer extensions
 
+See [dashboard recipes](../../docs/examples/dashboard-recipes.md) for custom pages,
+sortable columns, inspector metadata, composition, and offline export guidance.
+
 The default UI works without extension configuration. Consumers can supply overview blocks, sortable function columns, page/block replacements, additional pages, and offline export projections through the public API. See [the extension contract](../tracing/EXTENDING.md). Custom pages are consumer-owned in every recording mode; conditionally omit pages whose data is unavailable.
 
 ## Embed the default UI

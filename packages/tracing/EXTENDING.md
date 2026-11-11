@@ -13,6 +13,10 @@ Read part 1 first even if you only want UI work: a block can only show what the
 recorder captured, and the channel name you choose in part 1 is the key you read
 in part 2.
 
+More examples: [markers, samples, and collectors](../../docs/examples/tracing-data.md),
+[dashboard recipes](../../docs/examples/dashboard-recipes.md), and
+[context boundary patterns](../../docs/examples/context-boundaries.md).
+
 ## Part 1 — Emit custom data
 
 ### Attach metadata to a ray

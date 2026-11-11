@@ -67,6 +67,9 @@ captured separately and rethrown to preserve application behavior. This avoids
 patching `Promise` or depending on Node's `AsyncLocalStorage`, but depends on the
 engine's stack behavior and adds cost. [Mechanism and limits](./docs/how-tracing-works.md).
 
+For measured context-access costs and the limits of each approach, read the
+[ALS comparison](./docs/async-local-storage.md) and [Node 22/24 benchmark report](./docs/benchmarks/context-2026-11-11.md).
+
 ## Consumer-owned extensions
 
 Collectors emit namespaced samples such as cache hits or queue depth. Ray metadata

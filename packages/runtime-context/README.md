@@ -2,8 +2,8 @@
 
 This is an independent original library. For the integrated recording sessions and
 installable dashboard, see the [documentation index](../../docs/README.md) and
-[migration guide](../../docs/migration.md). Performance figures below are historical
-measurements; rerun the benchmarks on your target runtime before relying on them.
+[migration guide](../../docs/migration.md). The performance section links dated Node 22/24 measurements; rerun benchmarks on
+your target runtime before relying on them.
 
 `React.createContext` for plain JS. Store-only — no providers component, no consumer subscriptions, no re-rendering. Just a value scoped to a function call that survives `await`.
 
@@ -187,53 +187,30 @@ This package does not automatically propagate across unrelated task boundaries. 
 
 ## Performance
 
-Numbers from `yarn bench` on Node 22, paired against Node's `AsyncLocalStorage` (`als`) and a plain module-level global (`global`).
+The [2026-11-11 benchmark report](../../docs/benchmarks/context-2026-11-11.md)
+contains fresh runs on Node 22.16.0 and 24.11.1, raw output, hardware, units, and
+limitations. These are context-access benchmarks, not full tracer measurements.
 
-| Workload | `@sx/runtime-context` | `AsyncLocalStorage` | `global` |
-|---|---|---|---|
-| Hot read × 100 | **493 ns** | 845 ns | 74 ns |
-| Handler: 10 fn × 1 read | **105 ns** | 136 ns | 36 ns |
-| Multi: 3 contexts × 5 reads | **181 ns** | 241 ns | — |
-| `provider().run(noop)` | **39 ns** | 54 ns | — |
-| **Async: 3 awaits, 4 reads** | 24,833 ns | **1,270 ns** | 1,167 ns |
-| Async, *capture-local* pattern | 1,619 ns | **1,151 ns** | — |
+| Task | Node 22 context ns | Node 22 ALS ns | Node 24 context ns | Node 24 ALS ns |
+| --- | ---: | ---: | ---: | ---: |
+| 100 synchronous reads | 466–468 | 840–841 | 462–463 | 1,213–1,216 |
+| 10 function calls, one read each | 96–98 | 140–142 | 80–102 | 477–517 |
+| 3 contexts × 5 reads | 184–187 | 246–247 | 160–164 | 1,234–1,248 |
+| Empty provider/run scope | 41–44 | 54 | 29 | 372–385 |
+| 3 awaits, 4 context reads | 24,398–26,082 | 1,254–1,291 | 23,388–24,101 | 611–623 |
+| 3 awaits, read once into local | 1,585–1,638 | 1,158–1,181 | 421–423 | 580–581 |
 
-**The picture:**
+Values are ranges of whole-task mean nanoseconds across two process runs; lower
+is better. Synchronous tasks favored this implementation in these runs; repeated
+post-await reads strongly favored ALS. Capturing the value once locally avoids
+stack recovery but changes the application's access pattern.
 
-- **Historical sync benchmark — `runtime-context` was faster than `AsyncLocalStorage`** by 1.3-1.7×. ALS pays for hooking into Node's `async_hooks` even on sync calls; we don't have that overhead.
-- **Async usage where you read context many times across awaits — `AsyncLocalStorage` is dramatically faster** (~19× on the worst case). Node threads the store through every async boundary natively via `async_hooks`; we walk the stack with `new Error().stack` to recover the active frame after each `await`, and that costs ~6 μs per walk.
-- **Async usage with the *capture-local* pattern — both are essentially equal** and close to plain async. Read the context once at the top of the async function, then use the local.
+Read [the ALS comparison](../../docs/async-local-storage.md) for why, propagation
+gaps, and safety limits. Prefer ALS for general Node request context. Runtime
+coverage, memory behavior, and application latency require their own validation.
 
-```ts
-// ❌ pays a ~6 μs stack walk on each get after await
-async function slow() {
-  step();              // ctx.get() inside
-  await db.query();
-  step();              // walk
-  await network.send();
-  step();              // walk
-}
-
-// ✅ one read at the top, local everywhere else — ~1.5 μs total
-async function fast() {
-  const env = ctx.get();   // sync read, ~5 ns
-  step(env);
-  await db.query();
-  step(env);               // local
-  await network.send();
-  step(env);               // local
-}
-```
-
-**When to pick which:**
-
-- **`AsyncLocalStorage`** if you're Node-only and you do a lot of `ctx.get()` across many awaits without restructuring to capture-local.
-- **`@sx/runtime-context`** if you need browser support, want a smaller dependency footprint (~135 LOC vs Node's `async_hooks` machinery), have sync-heavy reads, or are willing to follow the capture-local pattern in async code. The capture-local version is competitive with ALS.
-
-Run them yourself:
-
-```bash
-yarn workspace @sx/runtime-context bench
+```sh
+yarn bench:context
 ```
 
 ## How it works

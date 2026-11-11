@@ -4,6 +4,9 @@
 
 | Example | Use it when |
 | --- | --- |
+| [Context across awaits and callbacks](./context-boundaries.md) | Compare local capture, explicit callback capture, and Node ALS propagation. |
+| [Markers, samples and reusable collectors](./tracing-data.md) | Choose the correct data scope, correlate a sample with a ray, or configure consumer-owned lifecycle hooks. |
+| [Dashboard extension recipes](./dashboard-recipes.md) | Add pages and columns, wrap core blocks, enrich the inspector, and compose features. |
 | [Extra data per tracing ray](./ray-metadata.md) | Each operation needs its own request context, cache outcomes, or result metadata, including after `await`. |
 | [Cache telemetry and custom dashboard](./cache-extension.md) | A consumer needs recording-wide samples and a custom dashboard block. |
 

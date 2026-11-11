@@ -2,6 +2,12 @@
 
 [Documentation index](./README.md)
 
+## Current measured report
+
+See the [2026-11-11 context benchmark report](./benchmarks/context-2026-11-11.md)
+for fresh Node 22 and Node 24 runs, per-workload tables, exact environment, and raw
+output. The [ALS comparison](./async-local-storage.md) explains mechanisms and safety.
+
 ## What is currently measured
 
 The checked-in benchmark scripts belong to the original `@sx/tracer` and
@@ -13,8 +19,8 @@ yarn bench:tracer
 yarn bench:context
 ```
 
-They build those packages and run their microbenchmarks. Numbers in their READMEs
-are historical observations, not fresh results for `@sx/tracing`, `@sx/recordings`,
+They build those packages and run their microbenchmarks. Older figures in package READMEs are historical observations; the linked report
+contains fresh context measurements. Neither is a full-pipeline result for `@sx/tracing`, `@sx/recordings`,
 or the dashboard. The integrated runtime has different capture and transport
 behavior. Do not copy legacy timings into claims about the integrated packages.
 
