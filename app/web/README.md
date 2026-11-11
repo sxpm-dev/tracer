@@ -25,7 +25,8 @@ Only the build requires Node. The output needs no server runtime, database, exte
 font service, or framework router. Articles, syntax highlighting, table-of-contents
 links, and navigation are generated HTML. Without JavaScript the navigation stays
 expanded and the native mobile disclosure remains usable. One optional script adds
-topic-title filtering and initially collapses navigation on small screens.
+topic-title filtering, keyboard-accessible example tabs, and initially collapses
+navigation on small screens. Without JavaScript, all example sections remain visible.
 
 ## GitHub Pages
 
@@ -69,13 +70,23 @@ blocks for new content. All existing standalone library URLs remain available.
 - `scripts/build.mjs`: page discovery, asset hashing, and output generation.
 - `scripts/render.mjs`: Markdown rendering, link resolution, and HTML layout.
 - `assets/site.css`: shared typography, reading layout, and responsive styles.
-- `assets/site.js`: progressive navigation enhancements.
+- `assets/site.js`: progressive navigation and example-tab enhancements.
 - `scripts/static-site.test.mjs`: exported links/assets, code fidelity, native
   navigation fallback, filtering, preview HTTP responses, and script-size budget.
 
+## Overview examples
+
+The four level-three sections under “Record an operation” in `content/index.md`
+become class-decorator, method-decorator, manual-tracing, and metadata tabs. Keep
+these headings in order; the “Capture the selected scenario” section is shared
+by all four examples. Each example defines `runScenario` for that capture block.
+The renderer preserves the Markdown headings and content as the no-JavaScript
+fallback. Tabs support arrow keys, Home/End, and normal Tab navigation.
+
 ## Size comparison
 
-Measured on this checkout during the 2026-11-11 replacement, using the overview's
+Historical measurements from the 2026-11-11 framework replacement, before the
+example tabs were added, using the overview's
 HTML and all directly referenced JavaScript files. Gzip sizes use Node's
 `gzipSync` defaults; they are artifact sizes, not network measurements.
 

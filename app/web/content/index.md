@@ -38,32 +38,166 @@ can lose ownership, and stack inspection adds cost.
 
 ## Record an operation
 
-Load the application with `?install-tracing` before its modules evaluate. Wrap the
-functions you want to inspect, then start and release a recording around a scenario.
+Trace a whole service, select individual methods, or wrap a function directly.
+These examples use a checkout flow: calculate a price, apply a discount, and
+explain the result with application data.
+
+Open the application with `?install-tracing` **before its modules evaluate**.
+Decorator examples require TypeScript's `"experimentalDecorators": true`
+([configuration and API](/guide/tracing/#instrument-code)); these are legacy
+TypeScript decorators, not the newer standard decorator API.
+
+### Class decorators
+
+Put `@Trace` on a service to capture its methods and their nested calls. Use
+`@TraceIgnore` for a helper you do not need in the recording.
 
 ```ts
-import {
-  trace, marker, startRecording, releaseRecording,
-} from '@sx/tracing';
+import { Trace, TraceIgnore } from '@sx/tracing';
+
+@Trace
+class Checkout {
+  static namespace = 'checkout';
+
+  total(prices: number[]) {
+    const subtotal = this.subtotal(prices);
+    return this.applyDiscount(subtotal);
+  }
+
+  subtotal(prices: number[]) {
+    return prices.reduce((sum, price) => sum + price, 0);
+  }
+
+  applyDiscount(amount: number) {
+    return this.round(amount * 0.9);
+  }
+
+  @TraceIgnore
+  round(amount: number) {
+    return Math.round(amount * 100) / 100;
+  }
+}
+
+const checkout = new Checkout();
+const runScenario = () => checkout.total([40, 60]); // 90
+```
+
+**Recorded:** `checkout.total` owns calls to `checkout.subtotal` and
+`checkout.applyDiscount`. The rounding helper is omitted. Here `static namespace`
+sets the method-name prefix; it is not the event's separate namespace field.
+
+### Method decorators
+
+Put `@Trace` on selected methods when you want a focused recording without
+instrumenting every method in a class.
+
+```ts
+import { Trace, marker } from '@sx/tracing';
+
+class Checkout {
+  @Trace
+  total(prices: number[]) {
+    const subtotal = prices.reduce((sum, price) => sum + price, 0);
+    return this.applyDiscount(subtotal);
+  }
+
+  @Trace
+  applyDiscount(amount: number) {
+    marker('discount-applied', { campaign: 'welcome', percent: 10 });
+    return amount * 0.9;
+  }
+
+  formatReceipt(amount: number) {
+    return `Total: ${amount.toFixed(2)}`;
+  }
+}
+
+const checkout = new Checkout();
+const runScenario = () => checkout.formatReceipt(checkout.total([40, 60]));
+```
+
+**Recorded:** `total` → `applyDiscount`, with a `discount-applied` marker.
+`formatReceipt` runs normally but is not captured. Method-only decorators use the
+method name; use a class decorator or a manual wrapper for a more specific name.
+
+### Manual tracing
+
+Wrap functions without decorators or a class. Give each operation an explicit
+name and namespace so independently owned modules can share a recording.
+
+```ts
+import { trace, marker } from '@sx/tracing';
+
+const applyDiscount = trace((amount: number) => {
+  marker('discount-applied', { campaign: 'welcome', percent: 10 });
+  return amount * 0.9;
+}, 'applyDiscount', { namespace: 'pricing' });
 
 const total = trace((prices: number[]) => {
-  marker('cart-size', { items: prices.length });
-  return prices.reduce((sum, price) => sum + price, 0);
+  const subtotal = prices.reduce((sum, price) => sum + price, 0);
+  return applyDiscount(subtotal);
 }, 'total', { namespace: 'checkout' });
+
+const runScenario = () => total([40, 60]); // 90
+```
+
+**Recorded:** a `total` call in `checkout` owns an `applyDiscount` call in `pricing`.
+Both belong to one ray. No decorator compiler configuration is needed.
+
+### Custom metadata
+
+Attach domain context to a ray so a call tree also explains *why* the application
+took that path. This example records whether a product price came from cache.
+
+```ts
+import { trace, marker, setTraceRayMetadata } from '@sx/tracing';
+
+const priceCache = new Map([['sku-42', 100]]);
+
+const quote = trace((sku: string) => {
+  const cached = priceCache.get(sku);
+  const hit = cached !== undefined;
+
+  setTraceRayMetadata('catalog.cache', {
+    version: 1,
+    sku,
+    outcome: hit ? 'hit' : 'miss',
+  });
+  marker('cache-lookup', { hit });
+
+  // A cache miss is an explicit outcome, not a fabricated price.
+  return cached === undefined ? null : { sku, price: cached * 0.9 };
+}, 'quote', { namespace: 'catalog' });
+
+const runScenario = () => quote('sku-42'); // { sku: 'sku-42', price: 90 }
+```
+
+**Recorded:** a `quote` ray with `catalog.cache` metadata and a `cache-lookup`
+marker. Consumers can show these fields in their own dashboard columns or blocks.
+For writes after `await`, use an explicit ray handle as shown in the
+[metadata guide](/guide/ray-metadata/).
+
+### Capture the selected scenario
+
+Each example defines `runScenario`. Add this capture boundary to the chosen
+example, or use [recording sessions](/guide/recordings/) to stream it to the dashboard.
+
+```ts
+import { startRecording, releaseRecording } from '@sx/tracing';
 
 startRecording({ mode: 'full', cpu: false });
 try {
-  total([12, 8, 5]);
+  runScenario();
 } finally {
   const recording = releaseRecording();
   console.log(recording.traces);
 }
 ```
 
-Use [recording sessions](/guide/recordings/) to send batched updates to the
-dashboard. The [setup guide](/guide/getting-started/) covers local package archives
-and the intended npm installation workflow; the integration has not yet been
-published as a release.
+Wrappers remain installed between recordings; capture is opt-in. For async
+scenarios, await the measured work before releasing the recording. The
+[setup guide](/guide/getting-started/) covers local package archives and the intended
+npm workflow; the integration has not yet been published as a release.
 
 ## Compare executions, not just outcomes
 

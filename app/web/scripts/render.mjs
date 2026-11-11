@@ -60,6 +60,7 @@ export async function renderMarkdown(source, { file, routes, base, highlighter }
     node.children?.forEach(decorate);
   }
   decorate(html);
+  if (file === 'app/web/content/index.md') groupExamples(html);
   return { html: toHtml(html), toc };
 }
 
@@ -85,4 +86,32 @@ ${page.file ? `<div class="sx-article-source"><a href="https://github.com/sxpm-d
 ${index >= 0 ? `<nav class="sx-pagination" aria-label="Adjacent guides">${adjacent(-1)}${adjacent(1)}</nav>` : ''}</article>
 ${toc.length ? `<aside class="sx-toc" aria-label="On this page"><p>On this page</p><ul>${toc.map(item => `<li><a href="#${escape(item.id)}">${escape(item.title)}</a></li>`).join('')}</ul></aside>` : ''}</div></main></div>
 <footer class="sx-footer"><span>sx-tracing · MIT</span><a href="https://github.com/sxpm-dev/tracer/tree/main/docs">Markdown documentation</a></footer></body></html>`;
+}
+
+
+// Headed Markdown remains readable on GitHub and without JavaScript.
+// Only the overview's four instrumentation examples become an enhanced tab group.
+function groupExamples(tree) {
+  const labels = ['Class decorators', 'Method decorators', 'Manual tracing', 'Custom metadata'];
+  const start = tree.children.findIndex(node => node.tagName === 'h3' && plain(node) === labels[0]);
+  if (start < 0) return;
+  let end = start + 1;
+  while (end < tree.children.length) {
+    const node = tree.children[end];
+    if (node.tagName === 'h2' || (node.tagName === 'h3' && !labels.includes(plain(node)))) break;
+    end++;
+  }
+  const element = (tagName, properties, children) => ({ type: 'element', tagName, properties, children });
+  const panels = [];
+  for (const node of tree.children.slice(start, end)) {
+    if (node.tagName === 'h3') {
+      panels.push(element('section', { id: `example-${panels.length}`, 'data-example-panel': '' }, []));
+    }
+    panels.at(-1).children.push(node);
+  }
+  const buttons = labels.map((label, index) => element('button', {
+    type: 'button', id: `example-tab-${index}`, 'aria-controls': `example-${index}`,
+  }, [{ type: 'text', value: label }]));
+  const tabs = element('div', { className: ['sx-example-tabs'], 'data-example-tabs': '', hidden: true }, buttons);
+  tree.children.splice(start, end - start, element('div', { className: ['sx-examples'], 'data-examples': '' }, [tabs, ...panels]));
 }

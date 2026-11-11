@@ -134,3 +134,34 @@ test('topic filter handles matches and empty results, and mobile navigation is n
   assert.ok([...doc.querySelectorAll('[data-nav-group] li')].some(item => !item.hidden && item.textContent.includes('Error.stack')));
   dom.window.close();
 });
+
+test('example tabs preserve a readable fallback and support keyboard selection', async () => {
+  const dom = new JSDOM(await readFile(path.join(output, 'index.html'), 'utf8'), { runScripts: 'outside-only' });
+  const doc = dom.window.document;
+  const panels = [...doc.querySelectorAll('[data-example-panel]')];
+  assert.equal(panels.length, 4);
+  assert.ok(panels.every(panel => !panel.hidden && panel.querySelector('h3') && panel.querySelector('pre code')));
+  assert.ok(doc.querySelector('[data-example-tabs]').hidden);
+  dom.window.matchMedia = () => ({ matches: false, addEventListener() {} });
+  dom.window.eval(await readFile(new URL('../assets/site.js', import.meta.url), 'utf8'));
+  const tabs = [...doc.querySelectorAll('[role="tab"]')];
+  assert.deepEqual(tabs.map(tab => tab.textContent), ['Class decorators', 'Method decorators', 'Manual tracing', 'Custom metadata']);
+  const selected = index => {
+    tabs.forEach((tab, current) => {
+      assert.equal(tab.getAttribute('aria-selected'), String(current === index));
+      assert.equal(tab.tabIndex, current === index ? 0 : -1);
+      assert.equal(panels[current].hidden, current !== index);
+      assert.equal(panels[current].getAttribute('aria-labelledby'), tab.id);
+      assert.equal(tab.getAttribute('aria-controls'), panels[current].id);
+    });
+  };
+  selected(0);
+  tabs[2].click(); selected(2);
+  const key = (index, key) => tabs[index].dispatchEvent(new dom.window.KeyboardEvent('keydown', {key, bubbles:true, cancelable:true}));
+  key(2, 'ArrowRight'); selected(3); assert.equal(doc.activeElement, tabs[3]);
+  key(3, 'ArrowRight'); selected(0);
+  key(0, 'ArrowLeft'); selected(3);
+  key(3, 'Home'); selected(0);
+  key(0, 'End'); selected(3);
+  dom.window.close();
+});

@@ -130,3 +130,15 @@ button { cursor: pointer; }
   .sx-navigation-panel > summary { min-height: 48px; }
   .sx-content { padding-top: 1.6rem; }
 }
+
+.sx-examples { margin: 1.5rem 0 2rem; min-width: 0; }
+.sx-example-tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--sx-border); overflow-x: auto; padding: .25rem .15rem; }
+.sx-example-tabs button { flex-shrink: 0; border: 0; border-radius: 4px; background: transparent; padding: .7rem .8rem; color: var(--sx-muted); font-size: .85rem; font-weight: 550; }
+.sx-example-tabs button:hover { color: var(--sx-ink); background: var(--sx-panel); }
+.sx-example-tabs button[aria-selected="true"] { background: #e7f2ec; color: #15513a; font-weight: 650; }
+.sx-example-tabs button:focus-visible { outline-offset: -2px; }
+.sx-examples[data-enhanced] [data-example-panel] > h3 { display: none; }
+[data-example-panel] { padding-top: .3rem; }
+@media (max-width: 760px) {
+  .sx-example-tabs button { min-height: 44px; padding-inline: .7rem; }
+}
