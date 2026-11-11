@@ -1,45 +1,79 @@
-# @sx/docs — existing website
+# @sx/docs — technical presentation and documentation
 
-Documentation site for [`@sx/runtime-context`](../../packages/runtime-context) and
-[`@sx/tracer`](../../packages/tracer), built with [Nextra 4](https://nextra.site) on Next.js.
+Static documentation for the tracing approach, recordings, and extensible npm
+dashboard. The home page explains the mechanism and workflows; the sidebar leads
+to guides, examples, benchmark evidence, package references, and the independent
+original libraries. It uses a familiar article/sidebar/table-of-contents layout.
 
-## Current coverage
+## Develop and build
 
-This site currently documents the original tracer and runtime-context libraries.
-The integrated tracing, recordings, dashboard, and consumer-extension guides live
-in the [Markdown documentation index](../../docs/README.md). They have not yet been
-migrated to the website. Treat those Markdown files as the current documentation
-for the integrated packages. Website changes are a separate phase.
+From the repository root, use the Node version in `.node-version` and Yarn 1:
 
-## Run it
+```sh
+yarn install --frozen-lockfile
+yarn dev:web
+# http://localhost:3000
 
-From the repo root:
-
-```bash
-yarn install
-yarn dev:web       # http://localhost:3000
-yarn build:web     # production build
+yarn build:web
+# Static HTML, CSS, JS, and .nojekyll in app/web/out/
+yarn workspace @sx/docs test
+yarn workspace @sx/docs start
+# Static preview at http://localhost:4173
 ```
 
-Or from this directory: `yarn dev`, `yarn build`, `yarn start`, `yarn typecheck`.
+The build uses Next.js with Nextra and `output: 'export'`. No Node server, API,
+database, or runtime rendering is required in deployment. Browser JavaScript adds
+topic filtering, the mobile navigation toggle, and client navigation; the articles
+are pre-rendered HTML. The topic filter searches navigation titles, not full text.
+`start` serves the static output for local inspection, not `next start`.
 
-## Layout
+## GitHub Pages and other subdirectory hosts
 
+Build with the deployment prefix **at build time**, without a trailing slash:
+
+```sh
+NEXT_PUBLIC_BASE_PATH=/sx-tracing yarn build:web
+NEXT_PUBLIC_BASE_PATH=/sx-tracing yarn workspace @sx/docs test
+NEXT_PUBLIC_BASE_PATH=/sx-tracing yarn workspace @sx/docs start
+# http://localhost:4173/sx-tracing/
 ```
-app/                    Next.js app router shell (catch-all MDX route, theme, styles)
-content/                the docs themselves — MDX + `_meta.ts` nav definitions
-├── index.mdx           landing page
-├── runtime-context/    getting-started · guides · api · examples · reference
-└── tracer/             getting-started · guides · api · examples · reference
-mdx-components.tsx      MDX component overrides
-next.config.mjs         Nextra config (`contentDirBasePath: "/"`)
-```
 
-## Editing docs
+Upload the **contents** of `app/web/out/`, including `.nojekyll`, to the site's
+root. The host mounts that root at `/sx-tracing/`; do not add another nested
+`sx-tracing` directory inside the artifact. For a custom domain or root-hosted
+site, omit `NEXT_PUBLIC_BASE_PATH` and rebuild. `trailingSlash: true` generates
+`guide/topic/index.html` so a static host can serve deep links and refreshes.
 
-Pages are plain MDX under `content/` — the file path is the URL. Sidebar order and titles come
-from the `_meta.ts` file in each directory; add an entry there when you add a page, otherwise it
-falls to the bottom of the nav with a title derived from the filename.
+A manually triggered [GitHub Pages workflow](../../.github/workflows/docs-pages.yml)
+builds, validates, and deploys the export. In repository **Settings → Pages**, set
+the source to **GitHub Actions**, then run **Deploy technical documentation** in
+Actions. It uses the repository name as the project-site prefix. For a root-hosted
+`owner.github.io` repository or custom domain, change the workflow prefix to an
+empty string. Pushing code alone does not trigger this deployment.
 
-Keep prose consistent with the package READMEs: the same caveats (V8 stack-format dependency,
-fire-and-forget async, "not OpenTelemetry") should be stated the same way in both places.
+See the [Nextra static-export guide](https://nextra.site/docs/guide/static-exports)
+and [Next.js static-export documentation](https://nextjs.org/docs/app/guides/static-exports)
+for framework constraints.
+
+## One source for GitHub and the website
+
+`lib/guides.mjs` maps repository Markdown files to stable website URLs and sidebar
+groups. Before dev/build, `scripts/sync-docs.mjs` generates `content/guide/*.md`.
+Those generated files are ignored by Git: edit the original file in `docs/` or
+`packages/`, then restart dev or run `yarn workspace @sx/docs sync:docs`.
+
+The generator parses Markdown, rewrites links to included guides as local site
+links, and points source files or other repository documents to GitHub. Code
+blocks remain code. The generated content is plain Markdown, so TypeScript angle
+brackets and prose braces are not interpreted as JSX.
+
+- `content/index.mdx`: authored technical overview.
+- `lib/guides.mjs`: curated reading order, source files, and route slugs.
+- `content/runtime-context/` and `content/tracer/`: existing standalone library guides.
+- `app/docs-shell.tsx`: responsive navigation and topic filtering.
+- `app/[[...mdxPath]]/page.tsx`: articles, page contents, source links, and adjacent guides.
+- `app/styles.css`: shared reading layout, code, tables, and print styles.
+
+To add a guide, add one manifest entry, regenerate, build, and run the static-site
+tests. They check every exported guide and local link/anchor/asset under the chosen
+prefix. Also inspect desktop/mobile layouts after changing the shell or styles.

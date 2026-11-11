@@ -4,13 +4,13 @@ import "./styles.css";
 
 export const metadata = {
   title: {
-    default: "@sx Docs",
-    template: "%s | @sx Docs",
+    default: "sx-tracing · Technical overview",
+    template: "%s | sx-tracing",
   },
   description:
-    "Documentation for @sx/runtime-context and @sx/tracer, small runtime instrumentation primitives for JavaScript.",
+    "Stack-based runtime tracing, recordings, extensible dashboards, and evidence-driven execution analysis.",
   icons: {
-    icon: "/icon.svg",
+    icon: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/icon.svg`,
   },
 };
 

@@ -1,96 +1,158 @@
 ---
-title: "@sx"
-description: "Small runtime instrumentation packages for JavaScript."
+title: "Technical overview"
+description: "How stack-based tracing turns application execution into inspectable evidence."
 ---
 
-<section className="sx-landing-hero">
-  <div className="sx-landing-kicker">Runtime instrumentation primitives</div>
-  <h1>Understand one operation without rewiring your app.</h1>
-  <div className="sx-landing-copy">{"Two focused packages for the boring, painful part of instrumentation: carrying operation identity through plain JavaScript and seeing what happened inside that operation. No Promise patching, no framework lock-in, no distributed tracing platform required."}</div>
-  <div className="sx-landing-actions">
-    <a href="/runtime-context">Open runtime-context docs</a>
-    <a href="/tracer">Open tracer docs</a>
-  </div>
-</section>
+# Trace how your code actually runs
 
-<div className="sx-landing-proof">
-  <div>
-    <strong>Browser + edge friendly</strong>
-    <span>No dependency on Node-only async context APIs for the core path.</span>
-  </div>
-  <div>
-    <strong>Explicit lifecycle</strong>
-    <span>You open a scope, run work, and know where the boundary is.</span>
-  </div>
-  <div>
-    <strong>Small enough to reason about</strong>
-    <span>The APIs are tiny because the packages solve one problem each.</span>
-  </div>
+sx-tracing records instrumented JavaScript calls, their relationships, timings,
+and consumer-defined data. Capture a scenario, inspect it in a dashboard, and
+compare what changed in the next execution.
+
+This is a technical introduction to the approach: how it recovers context from
+`Error.stack`, where that works, and how the recording becomes evidence for
+debugging, optimization, and execution comparisons.
+
+## The idea: recover the active call from the stack
+
+An `await` separates execution into continuations. A simple synchronous stack of
+active calls cannot, by itself, identify the owner of the resumed work.
+
+The tracing runtime associates named async wrappers with recording slots. On a
+supported async chain, it inspects `new Error().stack`, finds the wrapper marker,
+and looks up the active slot. Nested instrumentation can then attach to its owner.
+
+<div className="sx-mechanism" aria-label="Stack recovery: wrapper, await, stack inspection, recording slot">
+  <div><strong>Instrumented call</strong><code>named wrapper → slot</code><p>Associate an operation with capture state.</p></div>
+  <div><strong>Resume after await</strong><code>new Error().stack</code><p>Find a wrapper marker in the supported stack.</p></div>
+  <div><strong>Recover ownership</strong><code>slot → parent call</code><p>Attach the event to the recorded operation.</p></div>
 </div>
 
-<div className="sx-package-grid">
-  <a className="sx-package-card sx-package-card-large" href="/runtime-context">
-    <h2>@sx/runtime-context</h2>
-    <div>{"Store-only context for plain JavaScript. Use it for request ids, user ids, locales, tenants, and trace ids without threading parameters through every helper."}</div>
-    <span>Docs, API, guide, examples</span>
-  </a>
-  <a className="sx-package-card sx-package-card-large" href="/tracer">
-    <h2>@sx/tracer</h2>
-    <div>{"Scope-based tracing for call trees, inline markers, async steps, timing, and event forwarding. It records only when you open a trace scope."}</div>
-    <span>Docs, API, guide, examples</span>
-  </a>
-</div>
+**No error is thrown to perform this lookup.** Application errors are a separate
+case: they are captured and rethrown. The mechanism avoids patching `Promise` and
+does not require Node's `AsyncLocalStorage`, but stack inspection has a cost and
+recovery depends on the engine and async boundary.
 
-## The problem
+Read [the mechanism and examples](/guide/how-tracing-works/), then
+[context boundaries](/guide/context-boundaries/) for the cases that need care.
 
-Instrumentation often starts simple: add a request id to logs, record a few
-events around a workflow, find out why a checkout path did something weird. Then
-the code starts passing `requestId`, `userId`, `traceId`, and timing helpers
-through every function. Or it jumps straight to infrastructure built for
-distributed tracing when all you needed was visibility inside one process.
+## From instrumentation to a recording
 
-`@sx/runtime-context` answers: "what ambient state belongs to this operation?"
+The application defines the operations worth observing. A recording supplies the
+capture boundary; a dashboard supplies a view of the saved evidence.
 
-`@sx/tracer` answers: "what did this operation do?"
-
-They are separate docs because they are separate tools. You can use either
-alone, or combine them when a workflow needs both identity and a trace.
-
-## Real shape
-
-```ts
-import { createContext } from "@sx/runtime-context";
-import { marker, trace } from "@sx/tracer";
-
-const requestContext = createContext<{ requestId: string; userId?: string }>();
-
-const priceCart = trace(function priceCart(cart: Cart) {
-  const request = requestContext.get();
-
-  marker("items", { count: cart.items.length, requestId: request?.requestId });
-  return cart.items.reduce((sum, item) => sum + item.price, 0);
-});
-
-const report = await requestContext
-  .provider({ requestId: "req_123", userId: "u1" })
-  .run(() => trace.collect(() => priceCart(cart)));
+```text
+Application functions + markers + consumer data
+                     ↓
+         @sx/tracing captures the scenario
+                     ↓
+       @sx/recordings batches session updates
+                     ↓
+     @sx/dashboard stores and presents the data
 ```
 
-The context package keeps the request identity available. The tracer records the
-operation shape. Neither package needs to own your application runtime.
+Open the application with `?install-tracing` before its modules load. This example
+records a calculation in memory; session APIs can deliver it to the dashboard.
 
-## Shared constraints
+```ts
+import {
+  trace, marker, startRecording, releaseRecording,
+} from '@sx/tracing';
 
-- No `Promise` patching.
-- No built-in monkey-patching of timers or event targets.
-- Browser, edge runtime, and Node-friendly designs.
-- Tiny APIs with explicit lifecycle boundaries.
+const total = trace((prices: number[]) => {
+  marker('cart-size', { items: prices.length });
+  return prices.reduce((sum, price) => sum + price, 0);
+}, 'total', { namespace: 'checkout' });
 
-## Pick a package
+startRecording({ mode: 'full', cpu: false });
+try {
+  total([12, 8, 5]);
+} finally {
+  const recording = releaseRecording();
+  console.log(recording.traces);
+}
+```
 
-| Need | Package | Why |
+[Make your first recording](/guide/getting-started/) covers installation, capture,
+transport, and inspection. The package names are intended release names; until
+publication, use the repository or locally packed archives described in the guide.
+
+## What the evidence lets you ask
+
+### Understand and optimize with AI
+
+Give AI a recording, the matching source revision, and the scenario. Ask it to map
+observed calls to code, explain repeated work, and propose a measurable change.
+Record the same scenario again to verify the outcome.
+
+```text
+Instrument → Record → Match evidence to source → Optimize → Record again
+                         ↑                                  │
+                         └──────── Compare results ─────────┘
+```
+
+A captured execution supplies context that an AI's fresh run may not reproduce.
+An AI-run application can explore new hypotheses. Combine them: neither a trace
+nor an agent's explanation is a correctness proof. [The complete workflow](/guide/ai-runtime-workflow/)
+includes prompts, handoff artifacts, and tradeoffs.
+
+### Detect changed execution behind green E2E tests
+
+Two runs can reach the same screen through different paths. Compare normalized
+call structure separately from elapsed time to find extra calls, unexpected
+fallbacks, and retries early in CI.
+
+| Observation | E2E baseline | Candidate |
 | --- | --- | --- |
-| Read request metadata from helper code without passing it everywhere. | `@sx/runtime-context` | It provides scoped ambient state with a tiny API. |
-| Inspect a workflow's call tree and markers during development. | `@sx/tracer` | It records only inside `trace.collect`, so wrapped functions stay cheap outside a scope. |
-| Forward sampled in-process events to logs or telemetry. | `@sx/tracer` | `trace.subscribe` receives each recorded event. |
-| Full distributed tracing across services. | OpenTelemetry | `@sx/tracer` is intentionally smaller than spans, exporters, and propagation standards. |
+| Confirmation visible | Pass | Pass |
+| Product fetches | 0, warm cache | 2 |
+| Interpretation | Approved execution | Investigate the fallback and duplicate call |
+
+This example is illustrative. Structural comparison and anomaly detection are
+consumer-owned policies built on recording data, not automatic library features.
+See [E2E comparisons and anomaly detection](/guide/execution-anomalies/) for
+normalization, baseline management, and capture-quality checks.
+
+## Extend the data and its presentation
+
+Attach namespaced metadata to a ray, emit markers within a call, or register
+collectors for recording-wide samples. Cache hits, queue depth, and domain outcomes
+can sit alongside the generic call data.
+
+The npm dashboard runs with a basic UI by default. Consumers can add columns,
+blocks, pages, and data projections for their own signals.
+
+- [Extra data per tracing ray](/guide/ray-metadata/): independent owners and async handles.
+- [Cache telemetry example](/guide/cache-extension/): capture through to a custom view.
+- [Dashboard extensions](/guide/dashboard-recipes/): reusable UI integration recipes.
+
+For microfrontends, compatible package copies in one JavaScript realm share runtime
+and transport ownership through `globalThis`. The shell owns capture; subsystems
+contribute namespaced events. Separate iframes, workers, and backend services need
+explicit correlation. [Shared-runtime integration](/guide/shared-runtime/).
+
+## Packages and boundaries
+
+| Package | Responsibility |
+| --- | --- |
+| [@sx/tracing](/guide/tracing/) | Instrumentation, markers, context recovery, and in-memory capture |
+| [@sx/recordings](/guide/recordings/) | Recording sessions and batched transport; re-exports tracing APIs |
+| [@sx/dashboard](/guide/dashboard/) | Installable UI, CLI, local server, data APIs, and extension points |
+| [@sx/runtime-context](/runtime-context/) | Independent ambient context library |
+| [@sx/tracer](/tracer/) | Original independent scope-based tracer with a different API |
+
+These packages are not a distributed tracing platform. Captured behavior is only
+as complete as the instrumentation and supported context boundaries. The library
+does not automatically upload evidence to AI or resolve every event to source code.
+
+## Performance is a measured tradeoff
+
+Stack recovery and AsyncLocalStorage use different mechanisms with different
+propagation coverage and costs. A faster microbenchmark does not establish lower
+end-to-end application overhead. Compare the actual operation, engine, settings,
+and workload before choosing a capture policy.
+
+Read the [ALS comparison](/guide/async-local-storage/) for the idea, safety, and gaps;
+the [Node 22/24 benchmark tables](/guide/context-benchmarks/) for measured numbers
+and reproduction commands; and [performance evidence](/guide/performance/) for
+what the current tests and measurements do—and do not—establish.

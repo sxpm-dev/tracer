@@ -193,9 +193,10 @@ legacy microbenchmarks from recording overhead and dashboard performance reports
 
 - [`packages/`](./packages): the five libraries and their Markdown guides.
 - [`docs/`](./docs/README.md): onboarding, architecture, migration, troubleshooting, and contributor guides.
-- [`app/web/`](./app/web/README.md): existing site for the original libraries; expansion is a later phase.
+- [`app/web/`](./app/web/README.md): static technical presentation and documentation site.
 - [`scripts/`](./scripts): package consumer checks and optional benchmark utilities.
 
-Markdown documentation is the current reader entry point. The website has not yet
-been updated to cover the integrated packages. Package metadata declares MIT;
+The website is generated from the Markdown guides, with an authored technical
+overview. Run `yarn build:web` for a static export; see the
+[website guide](./app/web/README.md) for GitHub Pages deployment. Package metadata declares MIT;
 third-party dashboard font and icon notices are retained with that package.

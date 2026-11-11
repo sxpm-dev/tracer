@@ -1,11 +1,6 @@
 export default {
-  index: {
-    title: "Home",
-  },
-  "runtime-context": {
-    title: "@sx/runtime-context",
-  },
-  tracer: {
-    title: "@sx/tracer",
-  },
+  index: "Technical overview",
+  guide: "Guides",
+  "runtime-context": "@sx/runtime-context",
+  tracer: "@sx/tracer",
 };

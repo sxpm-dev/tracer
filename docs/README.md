@@ -2,7 +2,8 @@
 
 [Repository home](../README.md)
 
-Read these guides directly on GitHub. The website migration is a separate phase.
+Read these guides directly on GitHub or through the static documentation website.
+The [website guide](../app/web/README.md) covers local preview, static builds, and GitHub Pages.
 
 ## Analyze and optimize with AI
 

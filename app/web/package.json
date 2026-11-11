@@ -4,10 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "next --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "dev": "node scripts/sync-docs.mjs && next dev --turbopack",
+    "build": "node scripts/sync-docs.mjs && next build --webpack && node scripts/finish-export.mjs",
+    "start": "node scripts/serve-export.mjs",
+    "typecheck": "tsc --noEmit",
+    "sync:docs": "node scripts/sync-docs.mjs",
+    "test": "node --test scripts/static-site.test.mjs"
   },
   "dependencies": {
     "next": "^16.0.0",
@@ -20,6 +22,10 @@
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "unified": "^11.0.5",
+    "remark-parse": "^11.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-stringify": "^11.0.0"
   }
 }
