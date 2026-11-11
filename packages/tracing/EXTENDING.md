@@ -17,6 +17,9 @@ in part 2.
 
 ### Attach metadata to a ray
 
+See [extra data per tracing ray](../../docs/examples/ray-metadata.md) for complete
+examples of concurrent operations, independent consumers, and dashboard queries.
+
 Metadata describes the logical operation. Markers describe something that
 happened at a particular time within it.
 

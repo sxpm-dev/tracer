@@ -15,7 +15,13 @@ Read these guides directly on GitHub. The website migration is a separate phase.
 7. [Performance reports](../packages/tracing/PERFORMANCE_REPORTS.md): comparisons, formulas, CLI, and example configuration.
 8. [Offline analytics](../packages/tracing/tools/recording-query/README.md): Python queries over saved JSONL recordings.
 
-## Complete consumer example
+## Consumer examples
+
+[Extra data per tracing ray](./examples/ray-metadata.md) shows independent request context, cache outcomes, nested consumers, async handles, and dashboard reads.
+
+[Browse all examples](./examples/README.md).
+
+### Recording-wide data and UI
 
 [Cache telemetry and custom dashboard](./examples/cache-extension.md) includes a bounded collector, payload validation, summary-aware paged loading, cancellation, and a default-UI extension.
 
