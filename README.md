@@ -65,6 +65,22 @@ ambiguous names must remain visible gaps, not invented explanations.
 See the [AI-assisted optimization workflow](./docs/ai-runtime-workflow.md) for
 handoff artifacts, prompt examples, source mapping, and before/after comparisons.
 
+## Catch execution changes even when E2E stays green
+
+A test can reach the expected screen while taking a different path: duplicate
+fetches, extra retries, or a cache fallback. Record the scenario and compare its
+**normalized call structure** with a reviewed baseline, independently of timing
+variation. This can reveal execution anomalies early in CI.
+
+The same evidence supports consumer-owned anomaly detection across repeated runs:
+unexpected paths, changed call counts, errors, and custom cache signals. Tracing
+provides the data; structural comparison rules, baseline management, and automated
+alerts are implemented by the consumer. Matching traces supplement correctness
+tests and only cover captured behavior.
+
+See [E2E execution comparison and anomaly detection](./docs/execution-anomalies.md)
+for examples, normalization rules, baseline policies, and dashboard integration.
+
 ## Packages
 
 | Package | Purpose | Guide |

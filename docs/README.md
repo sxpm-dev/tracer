@@ -11,6 +11,12 @@ source and runtime evidence, map observations to code, optimize, and compare a
 second recording. Includes handoff artifacts, prompts, and tradeoffs versus
 AI-driven execution.
 
+## Detect execution changes
+
+[E2E execution comparison and anomaly detection](./execution-anomalies.md): catch
+changed paths behind green tests, compare structure separately from timing, and
+build consumer-owned detectors with reviewed baselines and explainable evidence.
+
 ## Learn and use
 
 1. [First recording](./getting-started.md): install, enable instrumentation, capture, and inspect.

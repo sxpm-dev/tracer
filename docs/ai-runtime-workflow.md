@@ -167,3 +167,8 @@ The strongest loop combines both: capture a representative baseline, use AI to
 connect evidence to code and propose a falsifiable change, then run the application
 again to measure the result. The recorder makes the evidence available; the
 analysis still needs verification.
+
+For execution changes that do not fail ordinary E2E assertions, add a
+[structural baseline comparison or consumer anomaly detector](./execution-anomalies.md).
+Compare paths and call counts independently of timing, then use the diff as
+evidence for the same source-mapping and verification loop.
