@@ -172,6 +172,19 @@ bootstrap order, a multi-subsystem example, the global API, version compatibilit
 and cross-boundary limitations. See [per-ray data](./docs/examples/ray-metadata.md)
 for attaching each subsystem's context to a shared operation.
 
+## Try large dashboard recordings
+
+```sh
+yarn dashboard:sample          # Four domains, one million observations each
+yarn dashboard:sample editor   # Just the design-editor scenario
+yarn dashboard                 # Open existing recordings without generating data
+```
+
+The repo generators model loaded editors, maps, games, and video previews with
+four subsystems and browser metrics. They write synthetic data to the repo's
+ignored `.recordings/`, outside the npm package. See
+[samples and the storage convention](./docs/dashboard-samples.md).
+
 ## Work on the repository
 
 Use the Node version in [`.node-version`](./.node-version) and Yarn 1.

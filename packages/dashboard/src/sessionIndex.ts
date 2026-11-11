@@ -24,7 +24,7 @@ import { queryOffset, querySummary } from './sessionQuery';
 import { exportIndexedSnapshot, type SnapshotProgress } from './snapshotExport';
 import { legacyEventOffset } from './timeline';
 
-const VERSION = 9;
+const VERSION = 10;
 const preparation = new Map<
   string,
   { bytes: number; phase: string; totalBytes: number }

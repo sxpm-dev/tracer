@@ -49,13 +49,18 @@ const MAX_REQUEST_BYTES = 8 * 1024 * 1024;
 const SESSION_ID = /^[a-zA-Z0-9_-]+$/;
 const sessionMutations = new Map<string, Promise<void>>();
 
+export function resolveRecordingsDirectory(directory = '.recordings'): string {
+  return resolve(directory);
+}
+
 export function createRecordingMiddleware({
   onRecordingDeleted,
-  recordingsDirectory = resolve(process.cwd(), '.recordings'),
+  recordingsDirectory,
 }: {
   onRecordingDeleted?: (id: string) => Promise<void>;
   recordingsDirectory?: string;
 } = {}) {
+  const directory = resolveRecordingsDirectory(recordingsDirectory);
   return async (
     request: IncomingMessage,
     response: ServerResponse,
@@ -72,11 +77,11 @@ export function createRecordingMiddleware({
       return;
     }
     try {
-      await mkdir(recordingsDirectory, { recursive: true });
+      await mkdir(directory, { recursive: true });
       await handleRequest(
         request,
         response,
-        recordingsDirectory,
+        directory,
         onRecordingDeleted,
       );
     } catch (error) {

@@ -15,8 +15,11 @@
     "build:web": "yarn workspace @sx/docs build",
     "test": "yarn workspace @sx/tracer test && yarn workspace @sx/runtime-context test && yarn workspace @sx/tracing test && yarn workspace @sx/recordings test && yarn workspace @sx/dashboard test",
     "typecheck": "yarn workspace @sx/tracer typecheck && yarn workspace @sx/runtime-context typecheck && yarn workspace @sx/tracing typecheck && yarn workspace @sx/recordings typecheck && yarn workspace @sx/dashboard typecheck",
-    "start:dashboard": "yarn workspace @sx/dashboard start",
-    "test:packages": "node scripts/test-package-artifacts.mjs"
+    "start:dashboard": "node scripts/dashboard.mjs",
+    "test:packages": "node scripts/test-package-artifacts.mjs",
+    "dashboard": "node scripts/dashboard.mjs",
+    "dashboard:sample": "node scripts/dashboard-sample.mjs",
+    "test:dashboard-samples": "node --test scripts/dashboard-samples/samples.test.mjs"
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447",
   "devDependencies": {

@@ -398,6 +398,17 @@ describe('page-scoped session data', () => {
       source,
     );
   });
+  it('distributes long recording activity across the full timeline', async () => {
+    await seed([{
+      type: 'events', ray: 'long',
+      events: Array.from({ length: 240 }, (_, id) => ({ ...event(id), at: id * 1000 })),
+    }]);
+    const path = resolve(directory, 'test.meta.json');
+    const meta = JSON.parse(await readFile(path, 'utf8'));
+    await writeFile(path, JSON.stringify({ ...meta, duration: 240000 }));
+    const summary = await createSessionClient(url).summary('test');
+    expect(summary.analysis.activity).toEqual(Array(120).fill(2));
+  });
   it('aggregates filtered call times into bounded buckets and pages call tree levels', async () => {
     await seed([
       {

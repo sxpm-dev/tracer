@@ -6,6 +6,7 @@ export const guides = [
   ['Foundations', 'shared-runtime', 'Shared frontend runtime', 'docs/shared-runtime.md'],
   ['Workflows', 'ai-runtime-workflow', 'Analyze runtime with AI', 'docs/ai-runtime-workflow.md'],
   ['Workflows', 'execution-anomalies', 'E2E & execution anomalies', 'docs/execution-anomalies.md'],
+  ['Workflows', 'dashboard-samples', 'Large samples & storage', 'docs/dashboard-samples.md'],
   ['Workflows', 'performance-reports', 'Compare recordings', 'packages/tracing/PERFORMANCE_REPORTS.md'],
   ['Workflows', 'offline-analytics', 'Offline analytics', 'packages/tracing/tools/recording-query/README.md'],
   ['Extending', 'ray-metadata', 'Extra data per ray', 'docs/examples/ray-metadata.md'],

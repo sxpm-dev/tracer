@@ -29,6 +29,12 @@ build consumer-owned detectors with reviewed baselines and explainable evidence.
 7. [Performance reports](../packages/tracing/PERFORMANCE_REPORTS.md): comparisons, formulas, CLI, and example configuration.
 8. [Offline analytics](../packages/tracing/tools/recording-query/README.md): Python queries over saved JSONL recordings.
 
+## Sample recordings and storage
+
+[Large dashboard samples](./dashboard-samples.md): generate realistic synthetic
+workloads, launch the dashboard, and use the same `.recordings/` convention in the
+repo, installed CLI, or a consumer's custom dashboard.
+
 ## Consumer examples
 
 [Extra data per tracing ray](./examples/ray-metadata.md) shows independent request context, cache outcomes, nested consumers, async handles, and dashboard reads.

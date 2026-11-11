@@ -253,6 +253,7 @@ function collectSummary(
     const second = secondIndex(
       Math.max(0, event.at - state.eventOffset),
       state.activity.length,
+      state.recording.duration,
     );
     state.activity[second] += 1;
     state.rootActivity[second] += Number(event.parent == null);

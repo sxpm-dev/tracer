@@ -442,6 +442,7 @@ function SignalChart({
   const selectedSecond = secondIndex(
     ((selected + 0.5) / TIMELINE_BUCKETS) * duration,
     item.points.length,
+    duration,
   );
   const selectedValue = item.points[selectedSecond] ?? 0;
   return (

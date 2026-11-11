@@ -9,6 +9,11 @@ Installing and launching the dashboard is covered in the
 [recorder README](./README.md#start-the-dashboard). This document covers what
 you can do beyond running the default UI.
 
+Recording storage defaults to `.recordings/` in the server's launch directory,
+including when serving a consumer's custom UI. The repo commands anchor that
+directory at the repository root. See [sample recordings and storage](../../docs/dashboard-samples.md)
+for the CLI, programmatic, and Vite conventions.
+
 ## Run the default dashboard
 
 Install the packages from npm:

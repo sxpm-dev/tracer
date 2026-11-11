@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { createRecordingMiddleware } from './recordingServer';
 
-export { createRecordingMiddleware } from './recordingServer';
+export { createRecordingMiddleware, resolveRecordingsDirectory } from './recordingServer';
 
 export interface RecordingServerOptions {
   dashboardDirectory?: string;

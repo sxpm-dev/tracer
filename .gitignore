@@ -50,3 +50,6 @@ Thumbs.db
 # Local import provenance; publish the integrated packages only.
 /epp-tracing-source/
 /epp-tracing-source-*.zip
+
+# Local recording data and rebuildable dashboard indexes.
+.recordings/

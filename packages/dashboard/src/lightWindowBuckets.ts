@@ -57,9 +57,7 @@ export function oneSecondBuckets(duration: number) {
 export function secondIndex(
   at: number,
   count: number,
-  // Callers that predate the cap pass no duration; below the cap a bucket is
-  // one second, so this matches what they already assumed.
-  duration = count * 1_000,
+  duration: number,
 ) {
   const width = bucketWidth(duration);
   return Math.max(0, Math.min(count - 1, Math.floor(at / width)));

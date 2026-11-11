@@ -1554,6 +1554,7 @@ export function Timeline({
         selected={secondIndex(
           ((selected + 0.5) / TIMELINE_BUCKETS) * duration,
           analysis.activity.length,
+          duration,
         )}
         series={[
           {

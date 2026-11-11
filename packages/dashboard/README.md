@@ -10,6 +10,18 @@ yarn add --dev @sx/dashboard
 yarn trace-dashboard --port 4178
 ```
 
+## Recording storage
+
+The CLI stores data in `.recordings/` under the directory where you launch it and
+prints that absolute path at startup. `--dashboard` changes the UI, not storage.
+Use `--recordings ./captures` only when you need a different location; the matching
+server/Vite option is `recordingsDirectory`. Package upgrades do not move the data.
+
+From this repository, `yarn dashboard` opens the root `.recordings/` and
+`yarn dashboard:sample` generates four large synthetic workloads first. Generators
+and datasets are repo-only and excluded from the npm package.
+[Sample commands and storage details](../../docs/dashboard-samples.md).
+
 ## Documentation
 
 Tracing is documented as one pipeline, in the recorder package, because
@@ -64,7 +76,7 @@ export function App() {
 ```
 
 For a customized build, pass `extensions` and serve the consumer's output with
-`trace-dashboard --dashboard ./dist --recordings ./local-traces`. The supplied
+`trace-dashboard --dashboard ./dist`. The supplied
 server handles dashboard routes. The CLI aliases are `dashboard` and
 `trace-dashboard`; `trace-performance-report` generates offline reports.
 
