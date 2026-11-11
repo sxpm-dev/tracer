@@ -30,7 +30,7 @@ export async function renderMarkdown(source, { file, routes, base, highlighter }
       if (url) {
         if (!path.posix.extname(url) && !url.endsWith('/')) url += '/';
         node.url = base + url;
-      } else node.url = `https://github.com/tuchk4/sx-tracing/blob/main/${resolved}`;
+      } else node.url = `https://github.com/sxpm-dev/tracer/blob/main/${resolved}`;
       if (hash) node.url += `#${hash}`;
     }
     node.children?.forEach(links);
@@ -78,11 +78,11 @@ export function documentHtml({ page, html, toc, pages, base, assets }) {
 <title>${escape(page.title)} | sx-tracing</title><meta name="description" content="${escape(page.description || 'JavaScript tracing: runtime mechanisms, recording workflows, examples, and reference.')}" />
 <link rel="icon" href="${href('/icon.svg')}" type="image/svg+xml"><link rel="stylesheet" href="${href(assets.css)}"><script src="${href(assets.js)}" defer></script></head>
 <body><a class="sx-skip" href="#main-content">Skip to content</a>
-<header class="sx-topbar"><a class="sx-logo" href="${href('/')}" aria-label="sx-tracing overview"><svg width="25" height="25" viewBox="0 0 25 25" aria-hidden="true"><path d="M5 4v17M5 8h9v6h6M5 18h9" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="14" r="2" fill="currentColor"/></svg>sx-tracing</a><span class="sx-topbar-description">JavaScript runtime tracing</span><a class="sx-repository" href="https://github.com/tuchk4/sx-tracing">GitHub</a></header>
+<header class="sx-topbar"><a class="sx-logo" href="${href('/')}" aria-label="sx-tracing overview"><svg width="25" height="25" viewBox="0 0 25 25" aria-hidden="true"><path d="M5 4v17M5 8h9v6h6M5 18h9" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="14" r="2" fill="currentColor"/></svg>sx-tracing</a><span class="sx-topbar-description">JavaScript runtime tracing</span><a class="sx-repository" href="https://github.com/sxpm-dev/tracer">GitHub</a></header>
 <div class="sx-shell"><aside class="sx-sidebar" aria-label="Documentation navigation"><details class="sx-navigation-panel" open><summary>Browse documentation</summary><nav id="site-navigation"><div class="sx-filter" hidden><label for="filter-guides">Find a topic</label><input id="filter-guides" type="search" placeholder="Filter topics…" autocomplete="off"></div>${link('/', 'Overview')}${nav}<p id="filter-empty" role="status" hidden>No matching topics. Try “stack”, “cache”, or “dashboard”.</p></nav></details></aside>
 <main id="main-content" class="sx-content" tabindex="-1"><div class="sx-article-layout"><article class="sx-article">${html}
-${page.file ? `<div class="sx-article-source"><a href="https://github.com/tuchk4/sx-tracing/blob/main/${escape(page.file)}">Edit this page on GitHub</a></div>` : ''}
+${page.file ? `<div class="sx-article-source"><a href="https://github.com/sxpm-dev/tracer/blob/main/${escape(page.file)}">Edit this page on GitHub</a></div>` : ''}
 ${index >= 0 ? `<nav class="sx-pagination" aria-label="Adjacent guides">${adjacent(-1)}${adjacent(1)}</nav>` : ''}</article>
 ${toc.length ? `<aside class="sx-toc" aria-label="On this page"><p>On this page</p><ul>${toc.map(item => `<li><a href="#${escape(item.id)}">${escape(item.title)}</a></li>`).join('')}</ul></aside>` : ''}</div></main></div>
-<footer class="sx-footer"><span>sx-tracing · MIT</span><a href="https://github.com/tuchk4/sx-tracing/tree/main/docs">Markdown documentation</a></footer></body></html>`;
+<footer class="sx-footer"><span>sx-tracing · MIT</span><a href="https://github.com/sxpm-dev/tracer/tree/main/docs">Markdown documentation</a></footer></body></html>`;
 }

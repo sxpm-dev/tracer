@@ -32,17 +32,17 @@ topic-title filtering and initially collapses navigation on small screens.
 Set the deployment prefix at build time, without a trailing slash:
 
 ```sh
-SITE_BASE_PATH=/sx-tracing yarn build:web
-SITE_BASE_PATH=/sx-tracing yarn workspace @sx/docs test
-SITE_BASE_PATH=/sx-tracing yarn workspace @sx/docs start
-# http://localhost:4173/sx-tracing/
+SITE_BASE_PATH=/tracer yarn build:web
+SITE_BASE_PATH=/tracer yarn workspace @sx/docs test
+SITE_BASE_PATH=/tracer yarn workspace @sx/docs start
+# http://localhost:4173/tracer/
 ```
 
 `NEXT_PUBLIC_BASE_PATH` remains accepted for existing automation; prefer
 `SITE_BASE_PATH`. For a custom domain or root-hosted site, omit both and rebuild.
 
 Upload the **contents** of `app/web/out/`, including `.nojekyll`. The host mounts
-that root at `/sx-tracing/`; do not nest another `sx-tracing` directory inside the
+that root at `/tracer/`; do not nest another `tracer` directory inside the
 artifact. Every route has an `index.html` for direct navigation and refreshes.
 CSS and JavaScript filenames include content hashes for cache invalidation.
 
